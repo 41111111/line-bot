@@ -15,10 +15,10 @@ line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
 # ===== MQTT 設定 =====
-MQTT_BROKER = "localhost"  # 或 localhost
+MQTT_BROKER = "broker.hivemq.com"  # 或 localhost
 MQTT_PORT = 1883
-MQTT_TOPIC_SUB = "chatbot/bot"
-MQTT_TOPIC_PUB = "chatbot/user"
+MQTT_TOPIC_SUB = "chatbot/johnisluck/1998/03/08/bot"
+MQTT_TOPIC_PUB = "chatbot/johnisluck/1998/03/08/user"
 user_token = None  # 用來記錄目前使用者 LINE ID
 
 # ===== ESP32 串流設定 =====
