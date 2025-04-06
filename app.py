@@ -64,12 +64,18 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     message = msg.payload.decode()
     print(f"📥 MQTT 收到：{msg.topic} -> {message}")
+    
+def on_disconnect(client, userdata, rc):
+    print(f"⚠️ MQTT 已中斷連線，rc = {rc}")
+
+mqtt_client.on_connect = on_connect
+mqtt_client.on_message = on_message
+mqtt_client.on_disconnect = on_disconnect
+client.reconnect_delay_set(min_delay=1, max_delay=30)
+mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 
 #特別重要 要用forever才能保住心跳
 def mqtt_loop_thread():
-    mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = on_message
-    mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
     mqtt_client.loop_forever()   
 threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 
