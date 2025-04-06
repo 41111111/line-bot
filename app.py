@@ -69,23 +69,11 @@ mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 #特別重要 要用forever才能保住心跳
-#def mqtt_loop_thread():
-#   mqtt_client.loop_forever()
+def mqtt_loop_thread():
+  mqtt_client.loop_forever()
     
-def mqtt_worker():
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(MQTT_BROKER, MQTT_PORT, 60)
+threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 
-    print("🚀 啟動 MQTT 接收執行緒...")
-    client.loop_forever()  # 一直跑在這，不會退出
-mqtt_thread = threading.Thread(target=mqtt_worker, daemon=True)
-mqtt_thread.start()
-#threading.Thread(target=mqtt_loop_thread, daemon=True).start()
-#def custom_handler(client, userdata, msg):
-#    print("➡️ 收到 MQTT：", msg.payload.decode())
-#mqtt_client.message_callback_add("chatbotjohnisluckbot", custom_handler)
 
 if connected_event.wait(timeout=5):
     print("✅ MQTT 連線完成，繼續啟動 Flask")
