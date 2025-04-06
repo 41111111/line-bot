@@ -56,7 +56,7 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg'):
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("🔗 MQTT 已連線成功")
-         client.subscribe(MQTT_TOPIC_BOT)
+        client.subscribe("chatbotjohnisluckbot")
         connected_event.set()  # ✅ 設定成功旗標
     else:
         print(f"❌ MQTT 連線失敗，錯誤碼：{rc}")
