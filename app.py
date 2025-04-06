@@ -79,7 +79,9 @@ def mqtt_worker():
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
 
     print("🚀 啟動 MQTT 接收執行緒...")
-    client.loop_forever()  # 一直跑在這，不會退出    
+    client.loop_forever()  # 一直跑在這，不會退出
+mqtt_thread = threading.Thread(target=mqtt_worker, daemon=True)
+mqtt_thread.start()
 #threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 #def custom_handler(client, userdata, msg):
 #    print("➡️ 收到 MQTT：", msg.payload.decode())
@@ -141,9 +143,6 @@ def handle_message(event):
     # ====== 其他：非指令內容 ======
     else:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="❌ 不在指令範圍內"))
-
-mqtt_thread = threading.Thread(target=mqtt_worker, daemon=True)
-mqtt_thread.start()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render 會提供環境變數 PORT
     app.run(host="0.0.0.0", port=port)
