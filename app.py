@@ -19,7 +19,7 @@ handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 # ===== MQTT 設定 =====
 MQTT_BROKER = "broker.emqx.io"  # 或 localhost
 MQTT_PORT = 1883
-MQTT_TOPIC_BOT = "chatbotjohnisluckbot"
+MQTT_TOPIC_SUB = "chatbotjohnisluckbot"
 MQTT_TOPIC_PUB = "chatbotjohnisluckuser"
 user_token = None  # 用來記錄目前使用者 LINE ID
 connected_event = threading.Event()
