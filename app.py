@@ -69,6 +69,12 @@ def handle_message(event):
     # ✅ 發送 MQTT，記錄詳細結果
     info = mqtt_client.publish(MQTT_TOPIC_PUB, msg)
     print(f"📤 嘗試發送 MQTT：topic = {MQTT_TOPIC_PUB}, payload = {msg}")
+    result = info.wait_for_publish(timeout=5)  # 等待 5 秒
+
+    if result:
+        print(f"📬 發送成功！")
+    else:
+        print(f"❌ 發送失敗！")
     
     # 確認訊息有成功送出（等一下 delivery 完成）
     result = info.wait_for_publish(timeout=3)
