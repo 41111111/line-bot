@@ -137,11 +137,13 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="❌ 不在指令範圍內"))
 def subscribe_loop():
     while True:
-        try:
-            mqtt_client.subscribe(MQTT_TOPIC_SUB)
+            mqtt_client.on_connect = on_connect
+            mqtt_client.on_message = on_message
+            mqtt_client.on_disconnect = on_disconnect
+            mqtt_client.reconnect_delay_set(min_delay=1, max_delay=30)
+            mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
             print("🔁 定時保險：重新訂閱 MQTT topic")
-        except:
-            pass
+
         time.sleep(30)
 threading.Thread(target=subscribe_loop, daemon=True).start()
 
