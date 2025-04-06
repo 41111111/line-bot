@@ -100,8 +100,10 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 擷取圖片失敗"))
     else:
         print(f"👤 LINE 使用者說：{msg}")
-        mqtt_client.publish(MQTT_TOPIC_PUB, msg)
+        mqtt_client.publish(MQTT_TOPIC_PUB, 'john_line')
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⏳ 指令已送出，等待回覆..."))
+        result = mqtt_client.publish(MQTT_TOPIC_PUB, msg)
+        print(f"📤 MQTT 發送結果：{result.rc}（0 表示成功）")
 
 if __name__ == "__main__":
     app.run()
