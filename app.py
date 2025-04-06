@@ -13,7 +13,7 @@ app = Flask(__name__, static_url_path='/static')
 line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
 
-ESP32_URL = "http://172.20.10.11:81/stream"  # 替換成你的 ESP32 實際 IP
+ESP32_URL = "https://f3a5-2001-b400-e4de-b8e-d50c-39cc-6723-1e97.ngrok-free.app/stream"  # 替換成你的 ESP32 實際 IP
 
 def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg'):
     print("🔄 擷取 ESP32 影像...")
