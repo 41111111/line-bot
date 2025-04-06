@@ -56,26 +56,34 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg'):
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("🔗 MQTT 已連線成功")
-        mqtt_client.subscribe("chatbotjohnisluckbot")
-        connected_event.set()  # ✅ 設定成功旗標
+        client.subscribe(MQTT_TOPIC_SUB)
+        print(f"📥 已訂閱主題：{MQTT_TOPIC_SUB}")
     else:
         print(f"❌ MQTT 連線失敗，錯誤碼：{rc}")
-        
+
 def on_message(client, userdata, msg):
-    print(f"📥 收到訊息：{msg.topic} -> {msg.payload.decode()}")
+    message = msg.payload.decode()
+    print(f"📥 MQTT 收到：{msg.topic} -> {message}")
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 #特別重要 要用forever才能保住心跳
-def mqtt_loop_thread():
-    mqtt_client.loop_forever()
+#def mqtt_loop_thread():
+#   mqtt_client.loop_forever()
     
-threading.Thread(target=mqtt_loop_thread, daemon=True).start()
-def custom_handler(client, userdata, msg):
-    print("➡️ 收到 MQTT：", msg.payload.decode())
+def mqtt_worker():
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(MQTT_BROKER, MQTT_PORT, 60)
 
-mqtt_client.message_callback_add("chatbotjohnisluckbot", custom_handler)
+    print("🚀 啟動 MQTT 接收執行緒...")
+    client.loop_forever()  # 一直跑在這，不會退出    
+#threading.Thread(target=mqtt_loop_thread, daemon=True).start()
+#def custom_handler(client, userdata, msg):
+#    print("➡️ 收到 MQTT：", msg.payload.decode())
+#mqtt_client.message_callback_add("chatbotjohnisluckbot", custom_handler)
 
 if connected_event.wait(timeout=5):
     print("✅ MQTT 連線完成，繼續啟動 Flask")
@@ -134,7 +142,8 @@ def handle_message(event):
     else:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="❌ 不在指令範圍內"))
 
-
+mqtt_thread = threading.Thread(target=mqtt_worker, daemon=True)
+mqtt_thread.start()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render 會提供環境變數 PORT
     app.run(host="0.0.0.0", port=port)
