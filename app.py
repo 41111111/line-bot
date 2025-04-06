@@ -70,7 +70,12 @@ mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 def mqtt_loop_thread():
     mqtt_client.subscribe("chatbotjohnisluckbot")
     mqtt_client.loop_forever()
+    print("loop_forever")
 threading.Thread(target=mqtt_loop_thread, daemon=True).start()
+def custom_handler(client, userdata, msg):
+    print("➡️ 收到 MQTT：", msg.payload.decode())
+
+mqtt_client.message_callback_add("chatbotjohnisluckbot", custom_handler)
 
 if connected_event.wait(timeout=5):
     print("✅ MQTT 連線完成，繼續啟動 Flask")
