@@ -71,7 +71,7 @@ def on_disconnect(client, userdata, rc):
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.on_disconnect = on_disconnect
-client.reconnect_delay_set(min_delay=1, max_delay=30)
+mqtt_client.reconnect_delay_set(min_delay=1, max_delay=30)
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 
 #特別重要 要用forever才能保住心跳
