@@ -143,8 +143,7 @@ def subscribe_loop():
             mqtt_client.reconnect_delay_set(min_delay=1, max_delay=30)
             mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
             print("🔁 定時保險：重新訂閱 MQTT topic")
-
-        time.sleep(30)
+    time.sleep(30)
 threading.Thread(target=subscribe_loop, daemon=True).start()
 
 if __name__ == "__main__":
