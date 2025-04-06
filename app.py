@@ -1,5 +1,6 @@
 import os
 import threading
+import time
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
@@ -52,24 +53,21 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg'):
 # ===== MQTT 回呼設定 =====
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
-        print("🔗 已連線 MQTT")
-        connected_event.set()  # ✅ 通知主程式連線成功
+        print("🔗 MQTT 已連線成功")
+        connected_event.set()  # ✅ 設定成功旗標
     else:
-        print("❌ 連線失敗，錯誤碼：", rc)
-
+        print(f"❌ MQTT 連線失敗，錯誤碼：{rc}")
+        
 def on_message(client, userdata, msg):
-    global user_token
-    response = msg.payload.decode()
+    print(f"📥 收到訊息：{msg.topic} -> {msg.payload.decode()}")
 
-    if user_token:
-        print(f"🤖 MQTT 回覆給 LINE 使用者：{response}")
-        line_bot_api.push_message(user_token, TextSendMessage(text=response))
-
-mqtt_client = mqtt.Client()
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
-mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
-mqtt_client.loop_start()
+mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
+#特別重要 要用forever才能保住心跳
+def mqtt_loop_thread():
+    mqtt_client.loop_forever()
+threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 
 if connected_event.wait(timeout=5):
     print("✅ MQTT 連線完成，繼續啟動 Flask")
@@ -94,7 +92,10 @@ def handle_message(event):
     msg = event.message.text.strip()
     user_token = event.source.user_id
 
-    if msg == "你好":
+    print(f"👤 LINE 使用者說：{msg}")
+
+    # ====== 指令：畫面 ======
+    if msg == "畫面":
         image_path = fetch_frame_from_mjpeg(ESP32_URL)
         if image_path and os.path.exists(image_path):
             domain = os.getenv("RENDER_EXTERNAL_HOSTNAME", "你的網址.onrender.com")
@@ -106,15 +107,25 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, image_message)
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 擷取圖片失敗"))
+
+    # ====== 指令：人臉辨識 ======
+    elif msg == "人臉辨識":
+        mqtt_msg = "john_1"
+        result = mqtt_client.publish(MQTT_TOPIC_PUB, mqtt_msg)
+        print(f"📤 MQTT 發送：{mqtt_msg}，rc = {result.rc}")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="✅ 已發送：人臉辨識 指令"))
+
+    # ====== 指令：光學辨識 ======
+    elif msg == "光學辨識":
+        mqtt_msg = "john_2"
+        result = mqtt_client.publish(MQTT_TOPIC_PUB, mqtt_msg)
+        print(f"📤 MQTT 發送：{mqtt_msg}，rc = {result.rc}")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="✅ 已發送：光學辨識 指令"))
+
+    # ====== 其他：非指令內容 ======
     else:
-        user_token = event.source.user_id
-        msg = event.message.text.strip()
-        print(f"👤 LINE 使用者說：{msg}")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="❌ 不在指令範圍內"))
 
-        result = mqtt_client.publish(MQTT_TOPIC_PUB, msg)
-        print(f"📤 MQTT 發送到 {MQTT_TOPIC_PUB}，內容：{msg}，發送結果 rc={result.rc}")
-
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⏳ 指令已送出，等待回覆..."))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render 會提供環境變數 PORT
