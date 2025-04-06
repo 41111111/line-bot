@@ -118,14 +118,16 @@ def handle_message(event):
         result = mqtt_client.publish(MQTT_TOPIC_PUB, mqtt_msg)
         print(f"📤 MQTT 發送：{mqtt_msg}，rc = {result.rc}")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="✅ 已發送：人臉辨識 指令"))
-        threading.Thread(target=mqtt_loop_thread, daemon=True).start()
+        mqtt_client.on_connect = on_connect
+        mqtt_client.on_message = on_message
+        mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
     # ====== 指令：光學辨識 ======
     elif msg == "光學辨識":
         mqtt_msg = "john_2"
         result = mqtt_client.publish(MQTT_TOPIC_PUB, mqtt_msg)
         print(f"📤 MQTT 發送：{mqtt_msg}，rc = {result.rc}")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="✅ 已發送：光學辨識 指令"))
-        threading.Thread(target=mqtt_loop_thread, daemon=True).stop()
+        
     # ====== 其他：非指令內容 ======
     else:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="❌ 不在指令範圍內"))
