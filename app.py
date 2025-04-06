@@ -95,7 +95,7 @@ threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 if connected_event.wait(timeout=5):
     print("✅ MQTT 連線完成，繼續啟動 Flask")
 else:
-    print("⚠️ 連線逾時，請查 broker 設定")
+    print("⚠️ 連線逾時，請查查 broker 設定")
 
 # ===== LINE Webhook 接收區 =====
 @app.route("/callback", methods=['POST'])
