@@ -1,6 +1,7 @@
 import os
 import threading
 import paho.mqtt.client as mqtt
+import time
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
@@ -76,7 +77,7 @@ def handle_message(event):
         if not mqtt_client.is_connected():
             print("🔁 MQTT 重新連線中...")
             mqtt_client.reconnect()
-            time.sleep(0.5)  # 可選：給點時間穩定連線
+            time.sleep(2)  # 可選：給點時間穩定連線
     
         info = mqtt_client.publish(MQTT_TOPIC_PUB, msg, retain=True, qos=1)
         info.wait_for_publish(timeout=5)
