@@ -15,7 +15,7 @@ handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 # ===== MQTT 設定 =====
 MQTT_BROKER = "broker.emqx.io"
 MQTT_PORT = 1883
-MQTT_TOPIC = "chatbotjohnisluckuser"
+MQTT_TOPIC_PUB = "chatbotjohnisluckuser"
 
 mqtt_client = mqtt.Client()
 
