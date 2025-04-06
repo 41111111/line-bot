@@ -108,13 +108,15 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 擷取圖片失敗"))
     else:
-        msg = "john_ttqq"
-        mqtt_client.publish(MQTT_TOPIC_PUB, msg)
+        global user_token
+        user_token = event.source.user_id
+        msg = event.message.text.strip()
         print(f"👤 LINE 使用者說：{msg}")
-        #mqtt_client.publish(MQTT_TOPIC_PUB, 'john_line')
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⏳ 指令已送出，等待回覆..."))
+
         result = mqtt_client.publish(MQTT_TOPIC_PUB, msg)
-        print(f"📤 MQTT 發送結果：{result.rc}（0 表示成功）")
+        print(f"📤 MQTT 發送到 {MQTT_TOPIC_PUB}，內容：{msg}，發送結果 rc={result.rc}")
+
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⏳ 指令已送出，等待回覆..."))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render 會提供環境變數 PORT
