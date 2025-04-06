@@ -13,7 +13,7 @@ handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
 # ===== MQTT 設定 =====
 MQTT_BROKER = "broker.emqx.io"
-MQTT_PORT = 1883
+MQTT_PORT = 1890
 MQTT_TOPIC = "chatbotjohnisluckuser"
 
 mqtt_client = mqtt.Client(client_id="linebot-client")
