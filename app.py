@@ -1,4 +1,5 @@
 import os
+import threading
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
@@ -51,8 +52,11 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg'):
 
 # ===== MQTT 回呼設定 =====
 def on_connect(client, userdata, flags, rc):
-    print("🔗 已連線 MQTT")
-    client.subscribe(MQTT_TOPIC_SUB)
+    if rc == 0:
+        print("🔗 已連線 MQTT")
+        connected_event.set()  # ✅ 通知主程式連線成功
+    else:
+        print("❌ 連線失敗，錯誤碼：", rc)
 
 def on_message(client, userdata, msg):
     global user_token
@@ -66,7 +70,12 @@ mqtt_client = mqtt.Client()
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
-mqtt_client.loop_forever()
+mqtt_client.loop_start()
+
+if connected_event.wait(timeout=5):
+    print("✅ MQTT 連線完成，繼續啟動 Flask")
+else:
+    print("⚠️ 連線逾時，請檢查 broker 設定")
 
 # ===== LINE Webhook 接收區 =====
 @app.route("/callback", methods=['POST'])
