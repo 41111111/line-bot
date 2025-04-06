@@ -52,53 +52,31 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     global user_token
-    user_token = event.source.user_id
     msg = event.message.text.strip()
+    user_token = event.source.user_id
 
     print(f"👤 LINE 使用者說：{msg}")
-    
-    # ✅ 檢查 MQTT client 是否還連著
-    if not mqtt_client.is_connected():
-        print("⚠️ MQTT client 尚未連線！請確認 broker 有正常啟動")
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="⚠️ MQTT 尚未連線，請稍後再試")
-        )
-        return
 
-    # ✅ 發送 MQTT，記錄詳細結果
-    info = mqtt_client.publish(MQTT_TOPIC_PUB, msg, retain=True)
-    print(f"📤 嘗試發送 MQTT：topic = {MQTT_TOPIC_PUB}, payload = {msg}")
-
-    info.wait_for_publish(timeout=5)
-
-    if info.is_published():
-        print("📬 發送成功！")
+    # ✅ 先馬上回覆 LINE（不管 MQTT 發成功與否）
+    try:
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="✅ 指令已送出至 MQTT")
         )
-    else:
-        print("❌ 發送失敗！")
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="⚠️ 發送失敗，請稍後重試")
-        )
-    
-    # 確認訊息有成功送出（等一下 delivery 完成）
-    result = info.wait_for_publish(timeout=3)
-    print(f"📬 publish() 結果：rc = {info.rc}, wait result = {result}")
+    except Exception as e:
+        print(f"⚠️ 回覆 LINE 失敗：{e}")
 
-    if info.rc == 0 and result:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="✅ 指令已送出至 MQTT")
-        )
-    else:
-        print("❌ MQTT 發送可能失敗，訊息未送達")
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="❌ 發送 MQTT 失敗，請稍後重試")
+    # ✅ 再發 MQTT（背景處理）
+    try:
+        info = mqtt_client.publish(MQTT_TOPIC_PUB, msg, retain=True)
+        info.wait_for_publish(timeout=5)
+        if info.is_published():
+            print("📬 MQTT 發送成功！")
+        else:
+            print("❌ MQTT 發送失敗")
+    except Exception as e:
+        print(f"❌ 發送 MQTT 出錯：{e}")
+
         )
 # ===== Flask 啟動點 =====
 if __name__ == "__main__":
