@@ -135,17 +135,6 @@ def handle_message(event):
     # ====== 其他：非指令內容 ======
     else:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="❌ 不在指令範圍內"))
-def subscribe_loop():
-    while True:
-            mqtt_client.on_connect = on_connect
-            mqtt_client.on_message = on_message
-            mqtt_client.on_disconnect = on_disconnect
-            mqtt_client.reconnect_delay_set(min_delay=1, max_delay=30)
-            mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
-            print("🔁 定時保險：重新訂閱 MQTT topic")
-    time.sleep(30)
-threading.Thread(target=subscribe_loop, daemon=True).start()
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render 會提供環境變數 PORT
     app.run(host="0.0.0.0", port=port)
