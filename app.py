@@ -13,7 +13,7 @@ line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
 # ===== MQTT 設定 =====
-MQTT_BROKER = "broker.emqx.io"
+MQTT_BROKER = "test.mosquitto.org"
 MQTT_PORT = 1883
 MQTT_TOPIC_PUB = "chatbotjohnisluckuser"
 
@@ -69,13 +69,17 @@ def handle_message(event):
     # ✅ 再發 MQTT（背景處理）
     try:
         info = mqtt_client.publish(MQTT_TOPIC_PUB, msg, retain=True)
+        print(f"📤 嘗試發送 MQTT：topic = {MQTT_TOPIC_PUB}, payload = {msg}, rc = {info.rc}")
+        
         info.wait_for_publish(timeout=5)
+        
         if info.is_published():
-            print("📬 MQTT 發送成功！")
+            print("📬 MQTT 發送成功")
         else:
-            print("❌ MQTT 發送失敗")
+            print("❌ MQTT 發送失敗（可能未完成 publish）")
     except Exception as e:
-        print(f"❌ 發送 MQTT 出錯：{e}")
+        print(f"🚨 發送 MQTT 出錯：{e}")
+
 
         
 # ===== Flask 啟動點 =====
