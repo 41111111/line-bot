@@ -66,7 +66,7 @@ mqtt_client = mqtt.Client()
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
-mqtt_client.loop_start()
+mqtt_client.loop_forever()
 
 # ===== LINE Webhook 接收區 =====
 @app.route("/callback", methods=['POST'])
