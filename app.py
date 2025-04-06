@@ -70,7 +70,10 @@ mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 #特別重要 要用forever才能保住心跳
 def mqtt_loop_thread():
-  mqtt_client.loop_forever()
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
+    mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)  
+    mqtt_client.loop_forever()
     
 threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 
