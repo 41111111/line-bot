@@ -21,7 +21,7 @@ MQTT_PORT = 1883
 MQTT_TOPIC_SUB = "chatbotjohnisluckbot"
 MQTT_TOPIC_PUB = "chatbotjohnisluckuser"
 user_token = None  # 用來記錄目前使用者 LINE ID
-
+connected_event = threading.Event()
 # ===== ESP32 串流設定 =====
 ESP32_URL = " https://f3a5-2001-b400-e4de-b8e-d50c-39cc-6723-1e97.ngrok-free.app/stream"  # 改成 ngrok 給你的公開網址
 
