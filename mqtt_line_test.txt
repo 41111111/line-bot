@@ -40,7 +40,7 @@ if connected_event.wait(timeout=5):
 else:
     print("⚠️ MQTT 連線逾時，請檢查 broker 設定")
 """
-def mqtt_loop_thread():
+def mqtt_loop_thread():#特別重要 要用forever才能保住心跳
     mqtt_client.loop_forever()
 threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 # ===== Webhook 路由 =====
