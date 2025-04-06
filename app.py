@@ -56,7 +56,6 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg'):
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("🔗 MQTT 已連線成功")
-        client.subscribe("chatbotjohnisluckbot")
         connected_event.set()  # ✅ 設定成功旗標
     else:
         print(f"❌ MQTT 連線失敗，錯誤碼：{rc}")
@@ -69,6 +68,7 @@ mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 #特別重要 要用forever才能保住心跳
 def mqtt_loop_thread():
+    mqtt_client.subscribe("chatbotjohnisluckbot")
     mqtt_client.loop_forever()
 threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 
