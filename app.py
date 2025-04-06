@@ -19,6 +19,7 @@ handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 # ===== MQTT 設定 =====
 MQTT_BROKER = "broker.emqx.io"  # 或 localhost
 MQTT_PORT = 1883
+MQTT_TOPIC_BOT = "chatbotjohnisluckbot"
 MQTT_TOPIC_PUB = "chatbotjohnisluckuser"
 user_token = None  # 用來記錄目前使用者 LINE ID
 connected_event = threading.Event()
@@ -55,6 +56,7 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg'):
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("🔗 MQTT 已連線成功")
+         client.subscribe(MQTT_TOPIC_BOT)
         connected_event.set()  # ✅ 設定成功旗標
     else:
         print(f"❌ MQTT 連線失敗，錯誤碼：{rc}")
