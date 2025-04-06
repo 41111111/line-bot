@@ -32,11 +32,16 @@ def on_message(client, userdata, msg):
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
+"""
 mqtt_client.loop_start()  # ✅ 背景執行，讓 Flask 可正常啟動
 if connected_event.wait(timeout=5):
     print("✅ MQTT 連線完成，繼續啟動 Flask")
 else:
     print("⚠️ MQTT 連線逾時，請檢查 broker 設定")
+"""
+def mqtt_loop_thread():
+    mqtt_client.loop_forever()
+threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 # ===== Webhook 路由 =====
 @app.route("/callback", methods=['POST'])
 def callback():
