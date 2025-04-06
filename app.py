@@ -73,10 +73,10 @@ def mqtt_loop_thread():
     mqtt_client.loop_forever()   
 threading.Thread(target=mqtt_loop_thread, daemon=True).start()
 
-#if connected_event.wait(timeout=5):
-    #print("✅ MQTT 連線完成，繼續啟動 Flask")
-#else:
-    #print("⚠️ 連線逾時，請檢查 broker 設定")
+if connected_event.wait(timeout=5):
+    print("✅ MQTT 連線完成，繼續啟動 Flask")
+else:
+    print("⚠️ 連線逾時，請查 broker 設定")
 
 # ===== LINE Webhook 接收區 =====
 @app.route("/callback", methods=['POST'])
@@ -118,7 +118,7 @@ def handle_message(event):
         result = mqtt_client.publish(MQTT_TOPIC_PUB, mqtt_msg)
         print(f"📤 MQTT 發送：{mqtt_msg}，rc = {result.rc}")
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="✅ 已發送：人臉辨識 指令"))
-        mqtt_client.subscribe(MQTT_TOPIC_SUB)
+
     # ====== 指令：光學辨識 ======
     elif msg == "光學辨識":
         mqtt_msg = "john_2"
