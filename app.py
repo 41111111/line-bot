@@ -108,7 +108,6 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 擷取圖片失敗"))
     else:
-        global user_token
         user_token = event.source.user_id
         msg = event.message.text.strip()
         print(f"👤 LINE 使用者說：{msg}")
