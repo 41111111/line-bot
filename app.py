@@ -16,7 +16,7 @@ MQTT_BROKER = "broker.emqx.io"
 MQTT_PORT = 1883
 MQTT_TOPIC = "chatbotjohnisluckuser"
 
-mqtt_client = mqtt.Client(transport="websockets")
+mqtt_client = mqtt.Client()
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -29,7 +29,7 @@ def on_message(client, userdata, msg):
     
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
-mqtt_client.connect("broker.emqx.io", 8083, 60)
+mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 mqtt_client.loop_start()  # ✅ 背景執行，讓 Flask 可正常啟動
 
 # ===== Webhook 路由 =====
@@ -46,19 +46,40 @@ def callback():
 # ===== 處理文字訊息事件 =====
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    user_msg = event.message.text.strip()
-    print(f"👤 LINE 使用者說：{user_msg}")
+    global user_token
+    user_token = event.source.user_id
+    msg = event.message.text.strip()
 
-    # ✅ 發送到 MQTT topic
-    result = mqtt_client.publish(MQTT_TOPIC, user_msg)
-    print(f"📤 MQTT 發送結果 rc={result.rc}，內容：{user_msg}")
+    print(f"👤 LINE 使用者說：{msg}")
+    
+    # ✅ 檢查 MQTT client 是否還連著
+    if not mqtt_client.is_connected():
+        print("⚠️ MQTT client 尚未連線！請確認 broker 有正常啟動")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="⚠️ MQTT 尚未連線，請稍後再試")
+        )
+        return
 
-    # ✅ 回覆 LINE 使用者
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="✅ 訊息已送出至 MQTT")
-    )
+    # ✅ 發送 MQTT，記錄詳細結果
+    info = mqtt_client.publish(MQTT_TOPIC_PUB, msg)
+    print(f"📤 嘗試發送 MQTT：topic = {MQTT_TOPIC_PUB}, payload = {msg}")
+    
+    # 確認訊息有成功送出（等一下 delivery 完成）
+    result = info.wait_for_publish(timeout=3)
+    print(f"📬 publish() 結果：rc = {info.rc}, wait result = {result}")
 
+    if info.rc == 0 and result:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="✅ 指令已送出至 MQTT")
+        )
+    else:
+        print("❌ MQTT 發送可能失敗，訊息未送達")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="❌ 發送 MQTT 失敗，請稍後重試")
+        )
 # ===== Flask 啟動點 =====
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
