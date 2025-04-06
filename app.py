@@ -76,8 +76,9 @@ def handle_message(event):
     try:
         if not mqtt_client.is_connected():
             print("🔁 MQTT 重新連線中...")
-            mqtt_client.reconnect()
+            mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
             time.sleep(1)
+            
         print(f"🔍 MQTT 狀態：已連線 = {mqtt_client.is_connected()}")
         info = mqtt_client.publish(MQTT_TOPIC_PUB, msg, retain=True, qos=1)
         info.wait_for_publish(timeout=5)
