@@ -77,8 +77,8 @@ def handle_message(event):
         if not mqtt_client.is_connected():
             print("🔁 MQTT 重新連線中...")
             mqtt_client.reconnect()
-            time.sleep(2)  # 可選：給點時間穩定連線
-    
+            time.sleep(1)
+        print(f"🔍 MQTT 狀態：已連線 = {mqtt_client.is_connected()}")
         info = mqtt_client.publish(MQTT_TOPIC_PUB, msg, retain=True, qos=1)
         info.wait_for_publish(timeout=5)
     
@@ -86,9 +86,9 @@ def handle_message(event):
             print("📬 MQTT 發送成功")
         else:
             print("❌ MQTT 發送失敗（未完成 publish）")
-    
     except Exception as e:
-        print(f"🚨 發送 MQTT 失敗：{e}")
+        print(f"🚨 MQTT 發送出錯：{e}")
+
 
 
         
