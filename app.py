@@ -138,3 +138,5 @@ def handle_message(event):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render 會提供環境變數 PORT
     app.run(host="0.0.0.0", port=port)
+mqtt_client.subscribe("chatbotjohnisluckbot")
+mqtt_client.loop(timeout=1.0)  # 主動輪詢一次，阻塞 1 秒
