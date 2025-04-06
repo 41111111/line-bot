@@ -1,9 +1,5 @@
 flask
 line-bot-sdk
 gunicorn
-face_recognition
-dlib
-opencv-python
 requests
 Pillow
-numpy
