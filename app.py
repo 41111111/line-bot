@@ -1,4 +1,5 @@
 import os
+import threading
 import paho.mqtt.client as mqtt
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -6,7 +7,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
-
+connected_event = threading.Event()
 # ===== LINE Bot 設定 =====
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
@@ -21,8 +22,9 @@ mqtt_client = mqtt.Client()
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("🔗 MQTT 已連線成功")
+        connected_event.set()  # ✅ 設定成功旗標
     else:
-        print("❌ MQTT 連線失敗，錯誤碼：", rc)
+        print(f"❌ MQTT 連線失敗，錯誤碼：{rc}")
         
 def on_message(client, userdata, msg):
     print(f"📥 收到訊息：{msg.topic} -> {msg.payload.decode()}")
@@ -31,7 +33,10 @@ mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT , 60)
 mqtt_client.loop_start()  # ✅ 背景執行，讓 Flask 可正常啟動
-
+if connected_event.wait(timeout=5):
+    print("✅ MQTT 連線完成，繼續啟動 Flask")
+else:
+    print("⚠️ MQTT 連線逾時，請檢查 broker 設定")
 # ===== Webhook 路由 =====
 @app.route("/callback", methods=['POST'])
 def callback():
