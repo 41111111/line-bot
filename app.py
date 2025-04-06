@@ -77,7 +77,7 @@ def handle_message(event):
     except Exception as e:
         print(f"❌ 發送 MQTT 出錯：{e}")
 
-        )
+        
 # ===== Flask 啟動點 =====
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
