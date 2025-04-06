@@ -3,3 +3,4 @@ line-bot-sdk
 gunicorn
 requests
 Pillow
+paho-mqtt
