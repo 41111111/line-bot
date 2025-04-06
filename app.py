@@ -66,7 +66,7 @@ mqtt_client = mqtt.Client()
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
-mqtt_client.loop_forever()
+mqtt_client.loop_start()
 
 # ===== LINE Webhook 接收區 =====
 @app.route("/callback", methods=['POST'])
@@ -108,4 +108,5 @@ def handle_message(event):
         print(f"📤 MQTT 發送結果：{result.rc}（0 表示成功）")
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))  # Render 會提供環境變數 PORT
+    app.run(host="0.0.0.0", port=port)
