@@ -23,8 +23,12 @@ def on_connect(client, userdata, flags, rc):
         print("🔗 MQTT 已連線成功")
     else:
         print("❌ MQTT 連線失敗，錯誤碼：", rc)
-
+        
+def on_message(client, userdata, msg):
+    print(f"📥 收到訊息：{msg.topic} -> {msg.payload.decode()}")
+    
 mqtt_client.on_connect = on_connect
+mqtt_client.on_message = on_message
 mqtt_client.connect("broker.emqx.io", 8083, 60)
 mqtt_client.loop_start()  # ✅ 背景執行，讓 Flask 可正常啟動
 
