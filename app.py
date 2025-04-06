@@ -66,7 +66,7 @@ mqtt_client = mqtt.Client()
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
-mqtt_client.loop_start()
+mqtt_client.loop_forever()
 
 # ===== LINE Webhook 接收區 =====
 @app.route("/callback", methods=['POST'])
@@ -99,8 +99,10 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 擷取圖片失敗"))
     else:
+        msg = "john_ttqq"
+        mqtt_client.publish(TOPIC, msg)
         print(f"👤 LINE 使用者說：{msg}")
-        mqtt_client.publish(MQTT_TOPIC_PUB, 'john_line')
+        #mqtt_client.publish(MQTT_TOPIC_PUB, 'john_line')
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⏳ 指令已送出，等待回覆..."))
         result = mqtt_client.publish(MQTT_TOPIC_PUB, msg)
         print(f"📤 MQTT 發送結果：{result.rc}（0 表示成功）")
