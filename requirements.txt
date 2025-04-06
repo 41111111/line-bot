@@ -4,4 +4,3 @@ gunicorn
 requests
 Pillow
 paho-mqtt
-threading
