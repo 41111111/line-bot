@@ -13,10 +13,10 @@ handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
 # ===== MQTT 設定 =====
 MQTT_BROKER = "broker.emqx.io"
-MQTT_PORT = 1890
+MQTT_PORT = 1883
 MQTT_TOPIC = "chatbotjohnisluckuser"
 
-mqtt_client = mqtt.Client(client_id="linebot-client")
+mqtt_client = mqtt.Client(transport="websockets")
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -25,7 +25,7 @@ def on_connect(client, userdata, flags, rc):
         print("❌ MQTT 連線失敗，錯誤碼：", rc)
 
 mqtt_client.on_connect = on_connect
-mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+client.connect("broker.emqx.io", 8083, 60)
 mqtt_client.loop_start()  # ✅ 背景執行，讓 Flask 可正常啟動
 
 # ===== Webhook 路由 =====
