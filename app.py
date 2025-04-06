@@ -25,7 +25,7 @@ def on_connect(client, userdata, flags, rc):
         print("❌ MQTT 連線失敗，錯誤碼：", rc)
 
 mqtt_client.on_connect = on_connect
-client.connect("broker.emqx.io", 8083, 60)
+mqtt_client.connect("broker.emqx.io", 8083, 60)
 mqtt_client.loop_start()  # ✅ 背景執行，讓 Flask 可正常啟動
 
 # ===== Webhook 路由 =====
