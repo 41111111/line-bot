@@ -1,6 +1,7 @@
 flask
-line-bot-sdk
-gunicorn
-requests
-Pillow
-paho-mqtt
+boto3
+#line-bot-sdk
+#gunicorn
+#requests
+#Pillow
+#paho-mqtt
