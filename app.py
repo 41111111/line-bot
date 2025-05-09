@@ -6,6 +6,7 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSend
 from linebot.exceptions import InvalidSignatureError
 from PIL import Image
 from io import BytesIO
+import time
 import cv2
 import numpy as np
 
@@ -14,11 +15,9 @@ app = Flask(__name__, static_url_path='/static')
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
-ESP32_URL = " https://47fa-2001-b400-e452-6f34-cd8b-6f26-1434-bee6.ngrok-free.app/stream"
-
+ESP32_URL = "https://47fa-2001-b400-e452-6f34-cd8b-6f26-1434-bee6.ngrok-free.app/stream"
 
 def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg', min_bytes=10000):
-    import time
     print("🔄 擷取 ESP32 影像...")
     try:
         os.makedirs("static", exist_ok=True)
@@ -33,7 +32,6 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg', min_bytes=10000):
 
             if a != -1 and b != -1:
                 jpg_data = bytes_data[a:b+2]
-                # 嘗試避免太快取得首幀（畫面還沒來得及變）
                 if len(jpg_data) < min_bytes and time.time() - start_time < 3:
                     continue
                 img = Image.open(BytesIO(jpg_data))
@@ -46,7 +44,6 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg', min_bytes=10000):
     except Exception as e:
         print(f"❌ 擷取失敗：{e}")
         return None
-
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -61,21 +58,19 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     msg = event.message.text.strip()
-    print(f"👤 LINE 使用者說：{msg}")
+    print(f"\U0001f464 LINE 使用者說：{msg}")
 
     if msg == "畫面":
         image_path = fetch_frame_from_mjpeg(ESP32_URL)
         if image_path and os.path.exists(image_path):
             domain = os.getenv("RENDER_EXTERNAL_HOSTNAME", "你的網址.onrender.com")
-            # 加上時間戳參數來避免 LINE 快取
             timestamp = int(time.time())
             image_url = f"https://{domain}/static/esp32.jpg?t={timestamp}"
-            
+
             image_message = ImageSendMessage(
                 original_content_url=image_url,
                 preview_image_url=image_url
             )
-            line_bot_api.reply_message(event.reply_token, image_message)
             line_bot_api.reply_message(event.reply_token, image_message)
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 擷取圖片失敗"))
