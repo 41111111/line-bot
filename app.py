@@ -17,27 +17,36 @@ handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 ESP32_URL = " https://47fa-2001-b400-e452-6f34-cd8b-6f26-1434-bee6.ngrok-free.app/stream"
 
 
-def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg'):
+def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg', min_bytes=10000):
+    import time
     print("🔄 擷取 ESP32 影像...")
     try:
         os.makedirs("static", exist_ok=True)
         stream = requests.get(url, stream=True, timeout=10)
         bytes_data = b''
+        start_time = time.time()
+
         for chunk in stream.iter_content(chunk_size=1024):
             bytes_data += chunk
             a = bytes_data.find(b'\xff\xd8')
             b = bytes_data.find(b'\xff\xd9')
+
             if a != -1 and b != -1:
                 jpg_data = bytes_data[a:b+2]
+                # 嘗試避免太快取得首幀（畫面還沒來得及變）
+                if len(jpg_data) < min_bytes and time.time() - start_time < 3:
+                    continue
                 img = Image.open(BytesIO(jpg_data))
                 img.save(save_as)
                 print(f"✅ 已儲存圖片到 {save_as}")
                 break
+
         stream.close()
         return save_as
     except Exception as e:
         print(f"❌ 擷取失敗：{e}")
         return None
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
