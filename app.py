@@ -67,12 +67,16 @@ def handle_message(event):
         image_path = fetch_frame_from_mjpeg(ESP32_URL)
         if image_path and os.path.exists(image_path):
             domain = os.getenv("RENDER_EXTERNAL_HOSTNAME", "你的網址.onrender.com")
-            image_url = f"https://{domain}/static/esp32.jpg"
+            # 加上時間戳參數來避免 LINE 快取
+            timestamp = int(time.time())
+            image_url = f"https://{domain}/static/esp32.jpg?t={timestamp}"
+            
             image_message = ImageSendMessage(
                 original_content_url=image_url,
                 preview_image_url=image_url
             )
             line_bot_api.reply_message(event.reply_token, image_message)
+                        line_bot_api.reply_message(event.reply_token, image_message)
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 擷取圖片失敗"))
 
