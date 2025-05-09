@@ -10,6 +10,16 @@ import requests
 from PIL import Image
 from io import BytesIO
 
+#====requirement ===
+flask
+line-bot-sdk
+gunicorn
+requests
+Pillow
+paho-mqtt
+#===========
+
+
 app = Flask(__name__, static_url_path='/static')
 
 # ===== LINE Bot 設定 =====
