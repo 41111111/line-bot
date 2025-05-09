@@ -76,7 +76,7 @@ def handle_message(event):
                 preview_image_url=image_url
             )
             line_bot_api.reply_message(event.reply_token, image_message)
-                        line_bot_api.reply_message(event.reply_token, image_message)
+            line_bot_api.reply_message(event.reply_token, image_message)
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 擷取圖片失敗"))
 
