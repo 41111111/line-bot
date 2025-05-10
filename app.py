@@ -116,7 +116,7 @@ def handle_message(event):
                         files={'file': f},
                         data={
                             'apikey': 'K89122706188957',
-                            'language': 'chi_tra',
+                            'language': 'cht',
                             'isOverlayRequired': False,
                             'OCREngine': 2,
                             'scale': False,
