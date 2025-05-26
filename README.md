@@ -11,7 +11,7 @@ graph TD
     MQTT[EMQX Broker]
 
     ESP32 -->|影像串流| Ngrok
-    User -->|傳送指令：「畫面 / 人臉辨識 / 光學辨識」| LINE
+    User -->|傳送指令：「畫面 / 人臉 / 光學」| LINE
     LINE -->|擷取畫面| Ngrok
     LINE -->|擷取畫面後分析| Rekognition
     LINE -->|擷取畫面後分析| OCR
