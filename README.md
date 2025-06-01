@@ -2,7 +2,7 @@
 
 ```mermaid
 graph TD
-    User[使用者手機\n(LINE端)]
+    User[使用者手機(LINE端)]
 
     subgraph Render Server
         subgraph LINE Bot Server端
@@ -12,7 +12,7 @@ graph TD
         end
     end
 
-    MQTT[MQTT Server\n(EMQX Broker)]
+    MQTT[MQTT Server(EMQX Broker)]
     ESP32[ESP32-CAM]
     HW416[HW-416\n紅外線感測器]
     Ngrok[Ngrok 串流轉發]
