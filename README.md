@@ -1,33 +1,26 @@
-# 專案架構圖
-
-```mermaid
 graph TD
-    User[使用者手機\n(LINE端)]
-    LB[Line Bot Server端\n(Line Bot Code)]
-    FR[Render Server\n(人臉識別 Code)]
-    MS[Render Server\n(MQTT 監聽 Code)]
-    MQTT[MQTT Server\n(EMQX Broker)]
+    User[使用者手機 (LINE)]
+    LineBot[LINE Bot Server端]
+    FaceRecog[人臉識別 Code (Render)]
+    MQTTListen[MQTT 監聽 Code (Render)]
+    MQTTServer[MQTT Server (EMQX Broker)]
     ESP32[ESP32-CAM]
-    HW416[HW-416\n紅外線感測器]
+    HW416[HW-416 紅外線感測器]
     Ngrok[Ngrok 串流轉發]
     OCR[OCR.Space OCR API]
 
-    %% 使用者互動流程
-    User -->|傳送指令：「畫面 / 人臉 / 光學」| LB
-    LB -->|擷取畫面| Ngrok
-    LB -->|擷取後送辨識| FR
-    LB -->|擷取後送辨識| OCR
-    FR -->|回傳分析結果| LB
-    OCR -->|回傳文字辨識結果| LB
-    LB -->|回傳結果| User
+    User -->|傳送指令：「畫面 / 人臉 / 光學」| LineBot
+    LineBot -->|擷取畫面| Ngrok
+    LineBot -->|擷取後送辨識| FaceRecog
+    LineBot -->|擷取後送辨識| OCR
+    FaceRecog -->|回傳分析結果| LineBot
+    OCR -->|回傳文字辨識結果| LineBot
+    LineBot -->|回傳結果| User
 
-    %% 紅外線感測流程
     HW416 -->|紅外觸發| ESP32
-    ESP32 -->|發送 MQTT 訊息| MQTT
-    MS -->|訂閱 MQTT 訊息| MQTT
-    MS -->|收到警示推播| LB
-    LB -->|警示訊息回傳| User
+    ESP32 -->|發送 MQTT 訊息| MQTTServer
+    MQTTListen -->|訂閱 MQTT 訊息| MQTTServer
+    MQTTListen -->|收到警示推播| LineBot
+    LineBot -->|警示訊息回傳| User
 
-    %% 影像串流
     ESP32 -->|影像串流| Ngrok
-
