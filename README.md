@@ -3,13 +3,11 @@ graph LR
     User[使用者手機（LINE 聊天室）]
 
     subgraph Render_Server [Render Server]
-        subgraph LINE_Bot_Server [LINE Bot Server端]
-            LB[Line Bot Code]
-            FR[人臉識別 Code]
-            MS[mqtt 監聽 Code]
-        end
+        LB[Line Bot Code]
+        FR[人臉識別 Code]
+        MS[mqtt 監聽 Code]
     end
-
+    LINE_Bot_Server [LINE Bot Server端]
     MQTT[EMQX Broker]
     ESP32[ESP32-CAM]
     HW416[HW-416\n紅外線感測器]
