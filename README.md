@@ -14,7 +14,7 @@ graph LR
     Ngrok[Ngrok 串流轉發]
 
     %% 使用者互動流程
-    User -->|傳送指令：「畫面 / 人臉 / 光學」| LB
+    User -->|傳送指令：「畫面 / 人臉 / 光學」| LINE_Bot_Server
     LB -->|擷取畫面| Ngrok
     LB -->|擷取後送辨識| FR
     LB -->|擷取後送辨識| OCR[OCR.Space OCR API]
