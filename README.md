@@ -2,7 +2,7 @@
 
 ```mermaid
 graph TD
-    User[使用者手機 (LINE端)]
+    User[使用者手機（LINE 聊天室）]
 
     subgraph Render Server
         subgraph LINE Bot Server端
