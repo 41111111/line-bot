@@ -15,19 +15,16 @@ graph LR
 
     %% 使用者互動流程
     User <-->|傳送指令| LINE_Bot_Server
-    LINE_Bot_Server <-->| | LB
+    LINE_Bot_Server <-->|LINE通訊協議| LB
     LB -->|擷取畫面| Ngrok
     LB <-->|辨識人臉| FR
-    LB -->|擷取後送辨識| OCR[OCR.Space OCR API]
-    OCR -->|回傳文字辨識結果| LB
+    LB <-->|辨識LED| OCR[OCR.Space OCR API]
     
-
     %% 紅外線感測流程
     HW416 -->|紅外觸發| ESP32
     ESP32 -->|發送 MQTT 訊息| MQTT
     MQTT -->|推播 MQTT 訊息| MS
     MS -->|收到警示推播| LINE_Bot_Server
     
-
     %% 影像串流
     ESP32 -->|影像串流| Ngrok
