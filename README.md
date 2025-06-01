@@ -27,8 +27,8 @@ graph LR
     HW416 -->|紅外觸發| ESP32
     ESP32 -->|發送 MQTT 訊息| MQTT
     MS -->|訂閱 MQTT 訊息| MQTT
-    MS -->|收到警示推播| LB
-    LB -->|警示訊息回傳| User
+    MS -->|收到警示推播| User
+    
 
     %% 影像串流
     ESP32 -->|影像串流| Ngrok
