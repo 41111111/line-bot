@@ -1,4 +1,4 @@
-mermaid
+```mermaid
 graph LR
     User[使用者手機（LINE 聊天室）]
 
