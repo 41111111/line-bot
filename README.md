@@ -1,11 +1,8 @@
-# 專案架構圖
-
-```mermaid
-graph TD
+graph LR
     User[使用者手機（LINE 聊天室）]
 
-    subgraph Render Server
-        subgraph LINE Bot Server端
+    subgraph Render_Server [Render Server]
+        subgraph LINE_Bot_Server [LINE Bot Server端]
             LB[Line Bot Code]
             FR[人臉識別 Code]
             MS[mqtt 監聽 Code]
