@@ -1,13 +1,12 @@
 ```mermaid
 graph LR
-    User[使用者手機（LINE 聊天室）]
-
-    subgraph Render_Server [Render Server]
+    User[1.使用者手機（LINE 聊天室）]
+    LINE_Bot_Server[2LINE Bot Server端]
+    subgraph Render_Server [3.Render Server]
         LB[Line Bot Code]
         FR[人臉識別 Code]
         MS[mqtt 監聽 Code]
     end
-    LINE_Bot_Server[LINE Bot Server端]
     MQTT[EMQX Broker Mqtt server]
     ESP32[ESP32-CAM]
     HW416[HW-416紅外線感測器]
