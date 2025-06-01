@@ -1,9 +1,9 @@
 ```mermaid
 graph LR
     User[1.使用者手機（LINE 聊天室）]
-    LINE_Bot_Server[2LINE Bot Server端]
+    LINE_Bot_Server[2.LINE Bot Server端]
     subgraph Render_Server [3.Render Server]
-        LB[Line Bot Code]
+        LB[3.1 Line Bot Code]
         FR[人臉識別 Code]
         MS[mqtt 監聽 Code]
     end
