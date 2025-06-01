@@ -1,5 +1,5 @@
 ```mermaid
-graph LR
+graph LD
     User[1 使用者手機（LINE 聊天室）]
     LINE_Bot_Server[2 LINE Bot Server端]
     subgraph Render_Server [3 Render Server]
