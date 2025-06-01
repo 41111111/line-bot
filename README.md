@@ -3,25 +3,20 @@
 ```mermaid
 graph TD
     User[使用者手機\n(LINE端)]
-
-    subgraph Render Server
-        subgraph LINE Bot Server端
-            LB[Line Bot Code]
-            FR[人臉識別 Code]
-            MS[mqtt 監聽 Code]
-        end
-    end
-
+    LB[Line Bot Server端\n(Line Bot Code)]
+    FR[Render Server\n(人臉識別 Code)]
+    MS[Render Server\n(MQTT 監聽 Code)]
     MQTT[MQTT Server\n(EMQX Broker)]
     ESP32[ESP32-CAM]
     HW416[HW-416\n紅外線感測器]
     Ngrok[Ngrok 串流轉發]
+    OCR[OCR.Space OCR API]
 
     %% 使用者互動流程
     User -->|傳送指令：「畫面 / 人臉 / 光學」| LB
     LB -->|擷取畫面| Ngrok
     LB -->|擷取後送辨識| FR
-    LB -->|擷取後送辨識| OCR[OCR.Space OCR API]
+    LB -->|擷取後送辨識| OCR
     FR -->|回傳分析結果| LB
     OCR -->|回傳文字辨識結果| LB
     LB -->|回傳結果| User
@@ -35,5 +30,4 @@ graph TD
 
     %% 影像串流
     ESP32 -->|影像串流| Ngrok
-
 
