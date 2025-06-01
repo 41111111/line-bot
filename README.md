@@ -12,7 +12,7 @@ graph TD
         end
     end
 
-    MQTT[MQTT Server(EMQX Broker)]
+    MQTT[EMQX Broker]
     ESP32[ESP32-CAM]
     HW416[HW-416\n紅外線感測器]
     Ngrok[Ngrok 串流轉發]
