@@ -6,6 +6,7 @@ graph TD
         LB[4_1 Line Bot Code]
         FR[4_2 人臉識別 Code]
         MS[4_3 Mqtt 監聽 Code]
+        OCR[OCR API]
     end
     MQTT[3 EMQX Broker Mqtt server]
     ESP32[2 ESP32-CAM]
