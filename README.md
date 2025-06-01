@@ -7,7 +7,7 @@ graph LR
         FR[人臉識別 Code]
         MS[mqtt 監聽 Code]
     end
-    LINE_Bot_Server [LINE Bot Server端]
+    LINE_Bot_Server[LINE Bot Server端]
     MQTT[EMQX Broker]
     ESP32[ESP32-CAM]
     HW416[HW-416\n紅外線感測器]
