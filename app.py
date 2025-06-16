@@ -46,30 +46,57 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg', min_bytes=10000):
         print(f"❌ 擷取失敗：{e}")
         return None
 
+
 @app.route("/callback", methods=['POST'])
 def callback():
     signature = request.headers.get('X-Line-Signature', '')
     body = request.get_data(as_text=True)
     print("🔧 LINE webhook body:\n", body)
+
     if not signature:
         # ✅ 沒有 signature，代表是 MQTT 模擬進來的
         try:
             data = json.loads(body)
             events = data.get("events", [])
             for e in events:
-                if e["type"] == "message" and e["message"]["type"] == "text":
-                    if e["message"]["text"] == "人臉辨識":
-                        user_id = e["source"]["userId"]
-                        line_bot_api.push_message(user_id, TextSendMessage(text="mqtt 觸發人臉辨識"))
-                        # 或 handle_face_recognition(user_id)
+                if e["message"]["text"] == "人臉辨識":
+                    user_id = e["source"]["userId"]
+                    image_path = fetch_frame_from_mjpeg(ESP32_URL)
+                    if image_path and os.path.exists(image_path):
+                        domain = os.getenv("RENDER_EXTERNAL_HOSTNAME", "你的網址.onrender.com")
+                        timestamp = int(time.time())
+                        image_url = f"https://{domain}/static/esp32.jpg?t={timestamp}"
+                
+                        with open(image_path, 'rb') as img:
+                            files = {'image': img}
+                            try:
+                                res = requests.post("https://rekognition.onrender.com/recognize", files=files, timeout=10)
+                                result = res.json()
+                                name = result.get("result", "辨識失敗")
+                                sim = result.get("similarity", 0)
+                                reply = f"✅ 辨識結果：{name}\n相似度：{sim:.2f}%" if sim else name
+                            except Exception as e:
+                                reply = f"❌ 辨識錯誤：{e}"
+
+                        image_message = ImageSendMessage(
+                            original_content_url=image_url,
+                            preview_image_url=image_url
+                        )
+                        text_message = TextSendMessage(text=reply)
+                        line_bot_api.push_message(user_id, [image_message, text_message])
+                    else:
+                        line_bot_api.push_message(user_id, TextSendMessage(text="❌ 無法擷取圖片"))
         except Exception as e:
             print("❌ 模擬 webhook 處理失敗：", e)
         return 'OK'
+
+    # 有 signature → LINE 正式訊息
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
     return 'OK'
+
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
