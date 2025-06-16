@@ -60,31 +60,6 @@ def callback():
                 if e["type"] == "message" and e["message"]["type"] == "text":
                     if e["message"]["text"] == "人臉辨識":
                         user_id = e["source"]["userId"]
-                        image_path = fetch_frame_from_mjpeg(ESP32_URL)
-                        if image_path and os.path.exists(image_path):
-                            domain = os.getenv("RENDER_EXTERNAL_HOSTNAME", "你的網址.onrender.com")
-                            timestamp = int(time.time())
-                            image_url = f"https://{domain}/static/esp32.jpg?t={timestamp}"
-                
-                            with open(image_path, 'rb') as img:
-                                files = {'image': img}
-                                try:
-                                    res = requests.post("https://rekognition.onrender.com/recognize", files=files, timeout=10)
-                                    result = res.json()
-                                    name = result.get("result", "辨識失敗")
-                                    sim = result.get("similarity", 0)
-                                    reply = f"✅ 辨識結果：{name}\n相似度：{sim:.2f}%" if sim else name
-                                except Exception as e:
-                                    reply = f"❌ 錯誤：{e}"
-                
-                            image_message = ImageSendMessage(
-                                original_content_url=image_url,
-                                preview_image_url=image_url
-                            )
-                            text_message = TextSendMessage(text=reply)
-                            line_bot_api.reply_message(event.reply_token, [image_message, text_message])
-                        else:
-                            line_bot_api.reply_message(event.reply_token, TextSendMessage(text="❌ 無法擷取圖片"))
                         line_bot_api.push_message(user_id, TextSendMessage(text="mqtt 觸發人臉辨識"))
                         # 或 handle_face_recognition(user_id)
         except Exception as e:
