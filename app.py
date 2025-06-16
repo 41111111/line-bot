@@ -47,8 +47,24 @@ def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg', min_bytes=10000):
 
 @app.route("/callback", methods=['POST'])
 def callback():
-    signature = request.headers['X-Line-Signature']
+    signature = request.headers.get('X-Line-Signature', '')
     body = request.get_data(as_text=True)
+    print("🔧 LINE webhook body:\n", body)
+    if not signature:
+        # ✅ 沒有 signature，代表是 MQTT 模擬進來的
+        try:
+            data = json.loads(body)
+            events = data.get("events", [])
+            for e in events:
+                if e["type"] == "message" and e["message"]["type"] == "text":
+                    if e["message"]["text"] == "人臉辨識":
+                        user_id = e["source"]["userId"]
+                        # 🔁 呼叫你的辨識邏輯
+                        line_bot_api.push_message(user_id, TextSendMessage(text="✅ 模擬觸發人臉辨識"))
+                        # 或 handle_face_recognition(user_id)
+        except Exception as e:
+            print("❌ 模擬 webhook 處理失敗：", e)
+        return 'OK'
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
