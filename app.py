@@ -1,5 +1,6 @@
 import os
 import requests
+import json
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
