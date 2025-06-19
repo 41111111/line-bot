@@ -16,7 +16,7 @@ app = Flask(__name__, static_url_path='/static')
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
-ESP32_URL = "https://6331-2001-b400-e4d9-6889-b06b-f5fe-f990-352b.ngrok-free.app/stream"
+ESP32_URL = "https://1ddd-2001-b400-e4d5-384b-8c74-702e-cd13-274f.ngrok-free.app/stream"
 
 def fetch_frame_from_mjpeg(url, save_as='static/esp32.jpg', min_bytes=10000):
     print("🔄 擷取 ESP32 影像...")
